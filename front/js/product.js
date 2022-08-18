@@ -32,23 +32,23 @@ pageReady(function(){
         
         // Save the ajax answer in the variable called items
         var productDetail = ajax.response;
-        // code to define product image
+        // Command to define product image
         var imageProduct = document.getElementsByClassName("item__img");
         var imageProductContent = "<img src='"+productDetail.imageUrl+"' alt='"+productDetail.altTxt+"'>"
         imageProduct[0].innerHTML += imageProductContent;
-        // code to define product name
+        // Command to define product name
         var nameProduct = document.getElementById("title");
         var nameProductContent = productDetail.name;
         nameProduct.innerHTML +=nameProductContent;
-        // code to define product price
+        // Command to define product price
         var priceProduct = document.getElementById("price");
         var priceProductContent = productDetail.price;
         priceProduct.innerHTML +=priceProductContent;
-        // code to define product description
+        // Command to define product description
         var descriptionProduct = document.getElementById("description");
         var descriptionProductContent = productDetail.description;
         descriptionProduct.innerHTML +=descriptionProductContent;
-        // code to define color options
+        // Command to define color options
         var colorProduct = document.getElementById("colors");
         productDetail.colors.forEach(function(item,index,array){
             var colorProductContent = "<option value='"+item+"'>"+item+"</option>";
