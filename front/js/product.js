@@ -16,22 +16,16 @@ function pageReady(myFunction){
 // add the items to the page/document (html "section id=items")
 pageReady(function(){
 
-    // Creates the variable AJAX to fetch data asynchronously at the backend URL
-    var ajax = new XMLHttpRequest();
+    
     const parametreUrl = new URLSearchParams(window.location.search);
     var saveId = parametreUrl.get('id');
 
-    // Inform the AJAX the backend adress to fetch the data, using the GET. command . Leave as "true" para que a chamada seja assíncrona
-    ajax.open("GET","http://localhost:3000/api/products/"+saveId,true);
+   
+    fetch("http://localhost:3000/api/products/"+saveId)
+    .then(function(response){return response.json()})
+    .then(function(item){
     
-    // Sets the type of data o get captured by the AJAX. The backend sends it in JSON
-    ajax.responseType = "json";
-    
-    // Creates a function on the "onload", the fucntion will only be executed when the ajax finish geting the data
-    ajax.onload = function(ev){
-        
-        // Save the ajax answer in the variable called items
-        var productDetail = ajax.response;
+        var productDetail = item;
         // Command to define product image
         var imageProduct = document.getElementsByClassName("item__img");
         var imageProductContent = "<img src='"+productDetail.imageUrl+"' alt='"+productDetail.altTxt+"'>"
@@ -54,8 +48,5 @@ pageReady(function(){
             var colorProductContent = "<option value='"+item+"'>"+item+"</option>";
             colorProduct.innerHTML +=colorProductContent;
         });
-    }
-
-    // Instruct the ajax to start conection to backend to fetch the data
-    ajax.send();
+    })
 });
