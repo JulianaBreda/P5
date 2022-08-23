@@ -27,8 +27,7 @@ pageReady(function(){
     .then(function(response){return response.json()})
     .then(function(items){
         items.forEach(function(item,index,array){
-            // Creates a new HTML line and dynamically fill values in "item" fields, which is an
-            // element captured by the ajax
+            // Creates a new HTML line and dynamically fill values in "item" fields
             newItem="<a href='./product.html?id="+item._id+"'> \
                         <article> \
                             <img src='"+item.imageUrl+"' alt=\""+item.altTxt+"\"> \

@@ -16,7 +16,31 @@ function pageReady(myFunction){
 // add the items to the page/document (html "section id=items")
 pageReady(function(){
 
-    
+// sets an alert when the user choses <100 items
+    var quantity = document.getElementById("quantity")
+    quantity.addEventListener("input",function(event){
+        if(quantity.value >100){
+            alert("quantité non autorisée")
+            quantity.value = 1
+        }
+    },false)
+//sets an alert when the user dont choose the quantity and/or color
+    var button = document.getElementById("addToCart")
+    button.addEventListener("click", function(event){
+        var colors = document.getElementById("colors")
+        if(quantity.value == ""|| quantity.value == 0){
+            alert("chosissez une quantité")
+        }
+        if(colors.value == ""){
+            alert ("choisissez une couleur")
+        }
+    },false)
+//Creates an array with cart information to be stored at local storage
+    var detailsCart = [id, quantity, color];
+
+    window.localStorage.setItem('user', JSON.stringify(detailsCart));
+
+// INSERT COMMENT
     const parametreUrl = new URLSearchParams(window.location.search);
     var saveId = parametreUrl.get('id');
 
