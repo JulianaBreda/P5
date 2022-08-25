@@ -1,3 +1,6 @@
+var saveId = "";
+var colors = "";
+var quantity = "";
 function pageReady(myFunction){
 
     // Check if the page/document is loaded 
@@ -17,7 +20,7 @@ function pageReady(myFunction){
 pageReady(function(){
 
 // sets an alert when the user choses <100 items
-    var quantity = document.getElementById("quantity")
+    quantity = document.getElementById("quantity")
     quantity.addEventListener("input",function(event){
         if(quantity.value >100){
             alert("quantité non autorisée")
@@ -27,22 +30,32 @@ pageReady(function(){
 //sets an alert when the user dont choose the quantity and/or color
     var button = document.getElementById("addToCart")
     button.addEventListener("click", function(event){
-        var colors = document.getElementById("colors")
+        colors = document.getElementById("colors")
         if(quantity.value == ""|| quantity.value == 0){
             alert("chosissez une quantité")
         }
         if(colors.value == ""){
             alert ("choisissez une couleur")
         }
-    },false)
 //Creates an array with cart information to be stored at local storage
-    var detailsCart = [id, quantity, color];
-
-    window.localStorage.setItem('user', JSON.stringify(detailsCart));
+    var currentCart = window.localStorage.getItem('detailsCart');
+    if(currentCart == null){
+        var detailsCart = {"collection":[{"id":saveId, "quantity":quantity.value, "colors":colors.value}]};
+        window.localStorage.setItem('detailsCart',JSON.stringify(detailsCart));
+        location.href = 'cart.html'
+    }
+    else{
+        var cartContent = JSON.parse(currentCart);
+        var currentProduct = {"id":saveId, "quantity":quantity.value, "colors":colors.value};
+        cartContent.collection.push(currentProduct)
+        window.localStorage.setItem('detailsCart', JSON.stringify(cartContent));
+        location.href = 'cart.html'
+    }
+    },false)
 
 // INSERT COMMENT
     const parametreUrl = new URLSearchParams(window.location.search);
-    var saveId = parametreUrl.get('id');
+    saveId = parametreUrl.get('id');
 
    
     fetch("http://localhost:3000/api/products/"+saveId)

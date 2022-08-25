@@ -16,9 +16,7 @@ function pageReady(myFunction){
 
 // Execute the handler through an anonymus function as parameter. This function will fetch the data in the backend and 
 // add the items to the page/document (html "section id=items")
-pageReady(function(){
-
-     
+pageReady(function(){ 
     
     // Selects the object "section" in the HTML page 
     var itemsSection = document.getElementById("items");
