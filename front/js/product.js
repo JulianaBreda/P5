@@ -1,13 +1,13 @@
-var saveId = "";
-var colors = "";
-var quantity = "";
+let saveId = "";
+let colors = "";
+let quantity = "";
 function pageReady(myFunction){
 
     // Check if the page/document is loaded 
     if (document.readyState === "complete" || document.readyState === "interactive") {
 
         // If yes, starts myFunction in the next milisecond (tick)
-        setTimeout(myFunction, 1);
+        myFunction();
     } else {
 
         // If no, add myFunction to the browser event loaded page
@@ -28,29 +28,58 @@ pageReady(function(){
         }
     },false)
 //sets an alert when the user dont choose the quantity and/or color
-    var button = document.getElementById("addToCart")
+    let button = document.getElementById("addToCart")
     button.addEventListener("click", function(event){
         colors = document.getElementById("colors")
+        //verifica se a quantidade é igual 0
         if(quantity.value == ""|| quantity.value == 0){
             alert("chosissez une quantité")
         }
-        if(colors.value == ""){
-            alert ("choisissez une couleur")
+        else{//so executa quando quantidade for diferente de zero
+            //verifica se tem cor selecionada
+            if(colors.value == ""){
+                alert ("choisissez une couleur")
+            }
+            else{//so executa se usuario escolher a cor
+        
+                //Creates an array with cart information to be stored at local storage
+                let currentCart = window.localStorage.getItem('detailsCart');
+                // Se o carrinho atual estiver vazio
+                if(currentCart == null){
+                    let detailsCart = {"collection":[{"id":saveId, "quantity":quantity.value, "colors":colors.value}]};
+                    window.localStorage.setItem('detailsCart',JSON.stringify(detailsCart));
+                    location.href = 'cart.html'
+                }
+                else{ // Caso o carrinho contenha algum item, verifica primeiro se já existe com mesmo ID e COLOR
+                    // Carrega o carrinho na cartContent
+                    let cartContent = JSON.parse(currentCart);
+                    // Inicia variaveis de controle (flags) pra ver se achou
+                    let foundSameItem = 0;
+                    let indexSameItem = -1;
+                    
+                    // Percorre todos os items comparando ID e COLOR para ver se encontrou
+                    cartContent.collection.forEach(function(item,index,array){
+                        if(item.id == saveId && item.colors == colors.value){
+                            foundSameItem = 1;
+                            indexSameItem = index;
+                        }
+                    });
+
+                    // Se encontrou um item identico, apenas atualiza o valor e salva na localStore
+                    if(foundSameItem == 1 && indexSameItem > -1){
+                        cartContent.collection[indexSameItem].quantity = parseInt(cartContent.collection[indexSameItem].quantity) + parseInt(quantity.value);
+                        window.localStorage.setItem('detailsCart', JSON.stringify(cartContent));
+                        location.href = 'cart.html';
+                    }
+                    else{ // Se caso não encontrou, adiciona o produto como se fosse um novo item do carrinho
+                        let currentProduct = {"id":saveId, "quantity":quantity.value, "colors":colors.value};
+                        cartContent.collection.push(currentProduct)
+                        window.localStorage.setItem('detailsCart', JSON.stringify(cartContent));
+                        location.href = 'cart.html'
+                    }
+                }
+            }
         }
-//Creates an array with cart information to be stored at local storage
-    var currentCart = window.localStorage.getItem('detailsCart');
-    if(currentCart == null){
-        var detailsCart = {"collection":[{"id":saveId, "quantity":quantity.value, "colors":colors.value}]};
-        window.localStorage.setItem('detailsCart',JSON.stringify(detailsCart));
-        location.href = 'cart.html'
-    }
-    else{
-        var cartContent = JSON.parse(currentCart);
-        var currentProduct = {"id":saveId, "quantity":quantity.value, "colors":colors.value};
-        cartContent.collection.push(currentProduct)
-        window.localStorage.setItem('detailsCart', JSON.stringify(cartContent));
-        location.href = 'cart.html'
-    }
     },false)
 
 // INSERT COMMENT
@@ -62,27 +91,27 @@ pageReady(function(){
     .then(function(response){return response.json()})
     .then(function(item){
     
-        var productDetail = item;
+        let productDetail = item;
         // Command to define product image
-        var imageProduct = document.getElementsByClassName("item__img");
-        var imageProductContent = "<img src='"+productDetail.imageUrl+"' alt='"+productDetail.altTxt+"'>"
+        let imageProduct = document.getElementsByClassName("item__img");
+        let imageProductContent = "<img src='"+productDetail.imageUrl+"' alt='"+productDetail.altTxt+"'>"
         imageProduct[0].innerHTML += imageProductContent;
         // Command to define product name
-        var nameProduct = document.getElementById("title");
-        var nameProductContent = productDetail.name;
+        let nameProduct = document.getElementById("title");
+        let nameProductContent = productDetail.name;
         nameProduct.innerHTML +=nameProductContent;
         // Command to define product price
-        var priceProduct = document.getElementById("price");
-        var priceProductContent = productDetail.price;
+        let priceProduct = document.getElementById("price");
+        let priceProductContent = productDetail.price;
         priceProduct.innerHTML +=priceProductContent;
         // Command to define product description
-        var descriptionProduct = document.getElementById("description");
-        var descriptionProductContent = productDetail.description;
+        let descriptionProduct = document.getElementById("description");
+        let descriptionProductContent = productDetail.description;
         descriptionProduct.innerHTML +=descriptionProductContent;
         // Command to define color options
-        var colorProduct = document.getElementById("colors");
+        let colorProduct = document.getElementById("colors");
         productDetail.colors.forEach(function(item,index,array){
-            var colorProductContent = "<option value='"+item+"'>"+item+"</option>";
+            let colorProductContent = "<option value='"+item+"'>"+item+"</option>";
             colorProduct.innerHTML +=colorProductContent;
         });
     })

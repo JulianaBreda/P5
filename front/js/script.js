@@ -6,7 +6,7 @@ function pageReady(myFunction){
     if (document.readyState === "complete" || document.readyState === "interactive") {
 
         // If yes, starts myFunction in the next milisecond (tick)
-        setTimeout(myFunction, 1);
+        myFunction();
     } else {
 
         // If no, add myFunction to the browser event loaded page
@@ -19,14 +19,14 @@ function pageReady(myFunction){
 pageReady(function(){ 
     
     // Selects the object "section" in the HTML page 
-    var itemsSection = document.getElementById("items");
+    let itemsSection = document.getElementById("items");
 
     fetch("http://localhost:3000/api/products")
     .then(function(response){return response.json()})
     .then(function(items){
         items.forEach(function(item,index,array){
             // Creates a new HTML line and dynamically fill values in "item" fields
-            newItem="<a href='./product.html?id="+item._id+"'> \
+            newItem ="<a href='./product.html?id="+item._id+"'> \
                         <article> \
                             <img src='"+item.imageUrl+"' alt=\""+item.altTxt+"\"> \
                             <h3 class='productName'>"+item.name+"</h3> \
