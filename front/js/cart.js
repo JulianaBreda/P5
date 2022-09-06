@@ -172,13 +172,17 @@ pageReady(function(){
     let address = document.getElementById("address");
     let city = document.getElementById("city");
     let email = document.getElementById("email");
-    if (allLetters(firstName) && allLetters(lastName) && allLetters(city) && checkEmail()){
+    let firstNameValidation = allLetters(firstName); 
+    let lastNameValidation = allLetters(lastName);
+    let cityValidation = allLetters(city);
+    let emailValidation = checkEmail();
+    if(firstNameValidation && lastNameValidation && cityValidation && emailValidation) {
       detailsCart = JSON.parse(window.localStorage.getItem('detailsCart'));
       let arrayProducts = [];
       detailsCart.collection.forEach(function(item, index, array){
         arrayProducts.push(item.id)
       })
-      let postBody = { //creates the object CONTACT
+      let order = { //creates the object CONTACT
         contact : {
           firstName: firstName.value, 
           lastName : lastName.value,
@@ -188,24 +192,31 @@ pageReady(function(){
         },
         products : arrayProducts
       }
-      console.log(postBody);
+      console.log(order);
       const fetchOption = {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-        "Accept":"application/json",
+          
+          'Accept':'application/json',
+          'Content-Type': 'application/json',
         }, 
-        body: JSON.stringify(postBody)
+        body: JSON.stringify(order)
       }; 
 
-      fetch("http://localhost:3000/api/order", fetchOption)        
-      .then((response) => response.json()) //API response
-      .then((data) => console.log(data))
+      fetch("http://localhost:3000/api/products/order", fetchOption)        
+      .then((res) => { 
+        if(res.ok){
+          return res.json();
+        }   
+      })   //API response
+      .then((data) => {
+        let orderId = data.orderId;
+        window.location = "confirmation.html?orderId="+orderId;
+        })
       .catch ((error) => console.log(error))
         }
   })
 });
-
 // FORM VALIDATION - checks if there is only letters on the form champ nom and prenom and city
 function allLetters(input){
   let letters = /^[a-zA-Z ]+$/;
@@ -215,16 +226,41 @@ function allLetters(input){
     }
     else {
         if(input.id == "firstName"){
-          inputName  = "Prenom"
+          let firstNameError =  document.getElementById("firstNameErrorMsg");
+          firstNameError.innerHTML = "caractères non autorisés"
         }
+        else {
+          let firstName = document.getElementById("firstName")
+          if(firstName.value.match(letters)){
+            let firstNameError =  document.getElementById("firstNameErrorMsg");
+            firstNameError.innerHTML = ""
+          } 
+        }
+
         if(input.id == "lastName"){
-          inputName = "Nom"
+          let lastNameError = document.getElementById("lastNameErrorMsg");
+          lastNameError.innerHTML = "caractères non autorisés"
         }
+        else {
+          let lastName = document.getElementById("lastName")
+          if(lastName.value.match(letters)){
+            let lastNameError =  document.getElementById("lastNameErrorMsg");
+            lastNameError.innerHTML = "" 
+          }
+        }
+
         if(input.id == "city"){
-          inputName = "Ville"
+          let cityError = document.getElementById("cityErrorMsg");
+          cityError.innerHTML = "caractères non autorisés"
         }
-        alert ('caractères invalides '+inputName)
-        input.focus();
+        else {
+          let city = document.getElementById("city")
+          if(city.value.match(letters)){
+            let cityError =  document.getElementById("cityErrorMsg");
+            cityError.innerHTML = ""
+          }
+        }
+        
         return false;
     }
 }
@@ -235,11 +271,14 @@ function checkEmail() {
   let filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 
     if (!filter.test(email.value)) {
-      alert("l'adresse email indiqué n'est pas valide");
+      let emailError = document.getElementById("emailErrorMsg");
+      emailError.innerHTML = "l'adresse email indiqué n'est pas valide"
       email.focus();
       return false;
     }
     else {
+      let emailError =  document.getElementById("emailErrorMsg");
+      emailError.innerHTML = "" 
       return true;
     }
 }
