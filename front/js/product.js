@@ -23,7 +23,7 @@ pageReady(function(){
     quantity = document.getElementById("quantity")
     quantity.addEventListener("input",function(event){
         if(quantity.value >100){
-            alert("quantité non autorisée")
+            alert("quantité non autorisée - choisissez un valeur entre 1 - 100")
             quantity.value = 1
         }
     },false)
@@ -31,33 +31,33 @@ pageReady(function(){
     let button = document.getElementById("addToCart")
     button.addEventListener("click", function(event){
         colors = document.getElementById("colors")
-        //verifica se a quantidade é igual 0
+        //verifies if quantity is equal 0
         if(quantity.value == ""|| quantity.value == 0){
             alert("chosissez une quantité")
         }
-        else{//so executa quando quantidade for diferente de zero
-            //verifica se tem cor selecionada
+        else{//only executes when the quantity is different from zero
+            //verifies if the color is selected
             if(colors.value == ""){
                 alert ("choisissez une couleur")
             }
-            else{//so executa se usuario escolher a cor
+            else{//only executes when the user choose the color
         
                 //Creates an array with cart information to be stored at local storage
                 let currentCart = window.localStorage.getItem('detailsCart');
-                // Se o carrinho atual estiver vazio
+                // if the current cart is empty
                 if(currentCart == null){
                     let detailsCart = {"collection":[{"id":saveId, "quantity":quantity.value, "colors":colors.value}]};
                     window.localStorage.setItem('detailsCart',JSON.stringify(detailsCart));
                     location.href = 'cart.html'
                 }
-                else{ // Caso o carrinho contenha algum item, verifica primeiro se já existe com mesmo ID e COLOR
-                    // Carrega o carrinho na cartContent
+                else{ // if there is any item on the cart, it will verify if the product has the same ID and color
+                    // Load the cart on the variable cartContent
                     let cartContent = JSON.parse(currentCart);
-                    // Inicia variaveis de controle (flags) pra ver se achou
+                    // start flag variable to see if it finds it
                     let foundSameItem = 0;
                     let indexSameItem = -1;
                     
-                    // Percorre todos os items comparando ID e COLOR para ver se encontrou
+                    // Go through all items comparing ID and COLOR to see if found
                     cartContent.collection.forEach(function(item,index,array){
                         if(item.id == saveId && item.colors == colors.value){
                             foundSameItem = 1;
@@ -65,13 +65,13 @@ pageReady(function(){
                         }
                     });
 
-                    // Se encontrou um item identico, apenas atualiza o valor e salva na localStore
+                    // If it finds the same item (same color and id) only update the amount and saves on the localStore
                     if(foundSameItem == 1 && indexSameItem > -1){
                         cartContent.collection[indexSameItem].quantity = parseInt(cartContent.collection[indexSameItem].quantity) + parseInt(quantity.value);
                         window.localStorage.setItem('detailsCart', JSON.stringify(cartContent));
                         location.href = 'cart.html';
                     }
-                    else{ // Se caso não encontrou, adiciona o produto como se fosse um novo item do carrinho
+                    else{ // If it doesnt find, add the product as a new item on the cart
                         let currentProduct = {"id":saveId, "quantity":quantity.value, "colors":colors.value};
                         cartContent.collection.push(currentProduct)
                         window.localStorage.setItem('detailsCart', JSON.stringify(cartContent));

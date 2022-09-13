@@ -84,7 +84,6 @@ function updateItemFromCart(id,colors,newQuantity){
   // Executa a função de atualizar preço/qtd total do carrinho
   updateCart();
 }
-//# Fim da alteração 2 #//
 
 // Execute the handler through an anonymous function as parameter. This function will fetch the data in the backend and 
 // add the items to the page/document (html "section id=items")
@@ -113,7 +112,7 @@ pageReady(function(){
                             <div class=\"cart__item__content__description\"> \
                               <h2>"+productName+"</h2> \
                               <p>"+product.colors+"</p> \
-                              <p>"+productPrice+"€</p> \
+                              <p>"+(productPrice*product.quantity)+"€</p> \
                             </div> \
                             <div class=\"cart__item__content__settings\"> \
                               <div class=\"cart__item__content__settings__quantity\"> \
@@ -227,7 +226,7 @@ function allLetters(input){
     else {
         if(input.id == "firstName"){
           let firstNameError =  document.getElementById("firstNameErrorMsg");
-          firstNameError.innerHTML = "caractères non autorisés"
+          firstNameError.innerHTML = "caractères non autorisés - ce champ accepte uniquement des lettres"
         }
         else {
           let firstName = document.getElementById("firstName")
@@ -239,7 +238,7 @@ function allLetters(input){
 
         if(input.id == "lastName"){
           let lastNameError = document.getElementById("lastNameErrorMsg");
-          lastNameError.innerHTML = "caractères non autorisés"
+          lastNameError.innerHTML = "caractères non autorisés - ce champ accepte uniquement des lettres"
         }
         else {
           let lastName = document.getElementById("lastName")
@@ -251,7 +250,7 @@ function allLetters(input){
 
         if(input.id == "city"){
           let cityError = document.getElementById("cityErrorMsg");
-          cityError.innerHTML = "caractères non autorisés"
+          cityError.innerHTML = "caractères non autorisés - ce champ accepte uniquement des lettres"
         }
         else {
           let city = document.getElementById("city")
