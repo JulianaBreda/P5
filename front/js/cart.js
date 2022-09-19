@@ -16,24 +16,24 @@ function pageReady(myFunction){
     }
 }
 
-//# Início da alteração - Adicionei uma nova função que recalcula o total a pagar depois que um item é removido do carrinho
+// - new function - recalculate the total amount when an item is removed form the cart
 function updateCart(){
-  // Zera os totais de preçoes e quantidades para refazer o calculo
+  // Resets the totals of prices and quantities to recalculate
   finalPrice=0;
   finalQuantity=0;
-  // Pega novamente o detailsCart da localStorage, já que ele foi atualizado com -1 item
+  // get detailsCart from localStorage, since it was updated with -1 item
   detailsCart = JSON.parse(window.localStorage.getItem('detailsCart'));
-  // Percorre novamente cada item da collection
+  // goes through each item in the collection again
   detailsCart.collection.forEach(function(product, index, array){
-    // Consulta a API novamente apenas para pegar o preço deste item
+    // Consults the API again to get the price of the item 
     fetch("http://localhost:3000/api/products/"+product.id)
     .then(function(response){return response.json()})
     .then(function(item){
-      // Recalcula os preços e quantidades para atualizar nos campos html
+      // Recalculate the prices and quantities to update the HTML fields
       finalPrice = finalPrice+(item.price*parseInt(product.quantity));
       finalQuantity = finalQuantity+parseInt(product.quantity);
 
-      // Atualiza os campos HTML com novas quantidades e preços, após remover item do carrinho
+      // Update HTML with new quantites and prices, after removing item from the cart
       let htmlTotalPrice = document.getElementById('totalPrice');
       let htmlTotalQuantity = document.getElementById('totalQuantity');
       htmlTotalPrice.innerHTML = finalPrice;
@@ -47,42 +47,50 @@ function updateCart(){
       htmlTotalQuantity.innerHTML = finalQuantity;
   }
 }
-//# Fim da alteração #//
 
-//# Início da alteração 2 - Criei uma função que REMOVE itens do carrinho, visto que não podemos utilizar o data-index para deletar no detailsCart (sem dar refresh na página)
-// Esta função recebe como parâmetro o ID do produto e a COLORS do produto a ser removido do carrinho
+// New function to remove items from the cart - visto que não podemos utilizar o data-index para deletar no detailsCart (sem dar refresh na página)
+// This fucntion gets as a parameter the product ID and product colors of the product to be removed from the cart
 function deleteItemFromCart(id,colors){
-  // Inseri uma nova flag para detectar se o item foi realmente removido com este ID e COLORS informado na função
   let itemWasRemoved = false;
-  // Passa item por item do detailsCart procurando pelo item com ID e COLORS informado na função
+  // goes item by item of the detailsCart searching for the item with the same ID and COLORS informed in the fucntion
   detailsCart.collection.forEach(function(item,index,array){
     if(item.id == id && item.colors == colors){
-      // Se encontrou, então remove o produto do array "collection" do detailsCart
+      // If finds, then remove the product from the array "collection" from the detailsCart
       array.splice(index,1);
-      // E informa que conseguiu deletar (true)
+      // informs if the item was deleted (true)
       itemWasRemoved = true;
     }
   });
-  // Atualiza o localStorage com o detailsCart sem o produto removido
+  // Updates the localStorage with the detailsCart without the product
   window.localStorage.setItem('detailsCart',JSON.stringify(detailsCart));
-  // Executa a função de atualizar preço/qtd total do carrinho
+  // Executes the function update total price/qtd of the cart
   updateCart();
-  // Retorna o valor TRUE ou FALSE (se deletou ou não)
+  // Return TRUE ou FALSE (if deleted or not)
   return itemWasRemoved;
 }
-//# Fim da alteração 2 #//
 
-//# Início da alteração 2 - Criei uma função para ATUALIZAR a quantidade do produto que o cliente alterou (Qté)
+//Criei uma função para ATUALIZAR a quantidade do produto que o cliente alterou (Qté)
 function updateItemFromCart(id,colors,newQuantity){
-    detailsCart.collection.forEach(function(item,index,array){
-    if(item.id == id && item.colors == colors){
-      item.quantity = newQuantity;
-    }
+  let quantTotalCart = 0;
+  detailsCart.collection.forEach(function(item,index, array){
+    quantTotalCart = quantTotalCart + parseInt(item.quantity);
   });
-  // Atualiza o localStorage com o detailsCart já atualizado com nova quantidade
-  window.localStorage.setItem('detailsCart',JSON.stringify(detailsCart));
-  // Executa a função de atualizar preço/qtd total do carrinho
-  updateCart();
+  if ((quantTotalCart+parseInt(newQuantity))<=100){
+    detailsCart.collection.forEach(function(item,index,array){
+      if(item.id == id && item.colors == colors){
+        item.quantity = newQuantity;
+      }
+    
+    });
+    // Updates the localStorage with theupdated with the new quantity
+    window.localStorage.setItem('detailsCart',JSON.stringify(detailsCart));
+    // Executes the function to update price/qtd
+    updateCart();
+  }  
+  else {
+    alert ("quantité max 100 articles")
+    location.reload();
+  }
 }
 
 // Execute the handler through an anonymous function as parameter. This function will fetch the data in the backend and 
@@ -125,11 +133,10 @@ pageReady(function(){
                             </div> \
                           </div> \
                         </article>";
-      //# Início de alteração # Troquei a linha "listProducts.innerHTML += htmlContent;" pelas 3 linhas abaixo:
+  
       let doc = new DOMParser().parseFromString(htmlContent,"text/html"); // Esta linha converte a string que montamos na variável htmlContent em "objeto HTML" (DOM) e salva na variável doc
       let recentArticles=doc.getElementsByClassName("cart__item"); // Coleta somente o objeto que contém a classe "cart__item", ou seja, somente pega o abjeto "<article>" recém criado e salva na variável "recentArticles"
       listProducts.appendChild(recentArticles[0]); // Agora sim, anexa somente este objeto (posição 0) ao HTML do carrinho, dentro da tag "<section id='cart__items'>"
-      //# Fim da alteração #//
 
       //functions that shows final amount dinamically on the HTML
       let htmlTotalPrice = document.getElementById('totalPrice');
@@ -144,22 +151,27 @@ pageReady(function(){
       let deleteItem = articleItem.querySelector(".deleteItem");
       deleteItem.addEventListener("click",function(event){
         let article = this.closest("article");
-        //# Início de alteração 2 # Corrigi a linha abaixo para não mais usar o "data-index" quando for deletar, mas sim passa o data-id e data-color
-        // Primeiro, chama a nova função de deleteItemFromCart e verifica se o retorno é verdadeiro ou falso (se deletou do localStorage ou não)
+        
+        // new function - deleteItemFromCart if return true or false (if it was deleted or not from the localStorage)
         if(deleteItemFromCart(article.dataset.id,article.dataset.color)){
-          // Se deletou com sucesso, dá o comando de remover o "<article>" do HTML
+          // if deleted, commands to remove "<article>" from HTML
           article.remove();
         }
-        //# Fim da alteração 2 #//
       },false);
 
       //# Início da alteração 2 # Adicionei já também na mesma promise, funções para quando o cliente mudar as quantidades no carrinho
       let inputQuantity = articleItem.querySelector('.itemQuantity');
+      let originalQuantity = inputQuantity.value;
       inputQuantity.addEventListener("change",function(event){
-        let article=this.closest("article");
-        updateItemFromCart(article.dataset.id,article.dataset.color,this.value)
+        if(this.value >100 || (this.value <=0 && this.value !="") || this.value % 1 !=0){
+          alert("quantité non autorisée - choisissez un valeur entre 1 - 100")
+          location.reload();
+        }
+        else {
+          let article=this.closest("article");
+          updateItemFromCart(article.dataset.id,article.dataset.color,this.value);        
+        }   
       });
-      //# Fim da alteração 2 #//
     });
   });
   //FORM VALIDATION - creates the form eventListener
@@ -181,7 +193,7 @@ pageReady(function(){
       detailsCart.collection.forEach(function(item, index, array){
         arrayProducts.push(item.id)
       })
-      let order = { //creates the object CONTACT
+      let order = { //creates the object CONTACT to send to the API
         contact : {
           firstName: firstName.value, 
           lastName : lastName.value,
@@ -218,7 +230,7 @@ pageReady(function(){
 });
 // FORM VALIDATION - checks if there is only letters on the form champ nom and prenom and city
 function allLetters(input){
-  let letters = /^[a-zA-Z ]+$/;
+  let letters = /^[\-/A-Za-z\u00C0-\u017F ]+$/;
   let inputName = "";
     if (input.value.match(letters)){
         return true;
@@ -263,7 +275,7 @@ function allLetters(input){
         return false;
     }
 }
-// checks if there is an error on the form champ email
+// checks if there is an error on the form field 'email'
 function checkEmail() {
 
   let email = document.getElementById('email');

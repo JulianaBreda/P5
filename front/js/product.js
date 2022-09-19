@@ -21,8 +21,8 @@ pageReady(function(){
 
 // sets an alert when the user choses <100 items
     quantity = document.getElementById("quantity")
-    quantity.addEventListener("input",function(event){
-        if(quantity.value >100){
+    quantity.addEventListener("input",function(event){ //sets an alert and forbid quantities over 100 and under 0 (decimal)
+        if(quantity.value >100 || (quantity.value <=0 && quantity.value !="") || quantity.value % 1 !=0){
             alert("quantité non autorisée - choisissez un valeur entre 1 - 100")
             quantity.value = 1
         }
@@ -56,6 +56,7 @@ pageReady(function(){
                     // start flag variable to see if it finds it
                     let foundSameItem = 0;
                     let indexSameItem = -1;
+                    let quantTotalCart = 0;
                     
                     // Go through all items comparing ID and COLOR to see if found
                     cartContent.collection.forEach(function(item,index,array){
@@ -63,26 +64,32 @@ pageReady(function(){
                             foundSameItem = 1;
                             indexSameItem = index;
                         }
+                        quantTotalCart = quantTotalCart + parseInt(item.quantity);
                     });
-
-                    // If it finds the same item (same color and id) only update the amount and saves on the localStore
-                    if(foundSameItem == 1 && indexSameItem > -1){
-                        cartContent.collection[indexSameItem].quantity = parseInt(cartContent.collection[indexSameItem].quantity) + parseInt(quantity.value);
-                        window.localStorage.setItem('detailsCart', JSON.stringify(cartContent));
-                        location.href = 'cart.html';
+                    
+                    if ((quantTotalCart + parseInt(quantity.value)) <= 100){ //only executes when less than 100 items in the cart
+                        // If it finds the same item (same color and id) only update the amount and saves on the localStore
+                        if(foundSameItem == 1 && indexSameItem > -1){
+                            cartContent.collection[indexSameItem].quantity = parseInt(cartContent.collection[indexSameItem].quantity) + parseInt(quantity.value);
+                           window.localStorage.setItem('detailsCart', JSON.stringify(cartContent)); 
+                           location.href = 'cart.html';
+                        }
+                        else{ // If it doesnt find, add the product as a new item on the cart
+                            let currentProduct = {"id":saveId, "quantity":quantity.value, "colors":colors.value};
+                            cartContent.collection.push(currentProduct)
+                            window.localStorage.setItem('detailsCart', JSON.stringify(cartContent));
+                            location.href = 'cart.html'
+                        }
                     }
-                    else{ // If it doesnt find, add the product as a new item on the cart
-                        let currentProduct = {"id":saveId, "quantity":quantity.value, "colors":colors.value};
-                        cartContent.collection.push(currentProduct)
-                        window.localStorage.setItem('detailsCart', JSON.stringify(cartContent));
-                        location.href = 'cart.html'
+                    else {
+                        alert ("quantité maxime 100 articles");
                     }
                 }
             }
         }
     },false)
 
-// INSERT COMMENT
+// update the html
     const parametreUrl = new URLSearchParams(window.location.search);
     saveId = parametreUrl.get('id');
 
