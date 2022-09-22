@@ -21,8 +21,10 @@ pageReady(function(){
 
 // sets an alert when the user choses <100 items
     quantity = document.getElementById("quantity")
-    quantity.addEventListener("input",function(event){ //sets an alert and forbid quantities over 100 and under 0 (decimal)
-        if(quantity.value >100 || (quantity.value <=0 && quantity.value !="") || quantity.value % 1 !=0){
+    quantity.addEventListener("input",function(event){
+        let filterDecimal = /^[0-9]+$/;
+        
+        if(quantity.value >=100 || quantity.value < 0 || !quantity.value.match(filterDecimal)){
             alert("quantité non autorisée - choisissez un valeur entre 1 - 100")
             quantity.value = 1
         }
