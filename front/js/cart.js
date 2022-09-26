@@ -69,7 +69,7 @@ function deleteItemFromCart(id,colors){
   return itemWasRemoved;
 }
 
-//Criei uma função para ATUALIZAR a quantidade do produto que o cliente alterou (Qté)
+//Function to update quantity altered by the user 
 function updateItemFromCart(id,colors,newQuantity){
   let quantTotalCart = 0;
   detailsCart.collection.forEach(function(item,index, array){
@@ -79,10 +79,9 @@ function updateItemFromCart(id,colors,newQuantity){
     detailsCart.collection.forEach(function(item,index,array){
       if(item.id == id && item.colors == colors){
         item.quantity = newQuantity;
-      }
-    
+      }  
     });
-    // Updates the localStorage with theupdated with the new quantity
+    // Updates the localStorage with the updated new quantity
     window.localStorage.setItem('detailsCart',JSON.stringify(detailsCart));
     // Executes the function to update price/qtd
     updateCart();
@@ -136,7 +135,7 @@ pageReady(function(){
   
       let doc = new DOMParser().parseFromString(htmlContent,"text/html"); // Esta linha converte a string que montamos na variável htmlContent em "objeto HTML" (DOM) e salva na variável doc
       let recentArticles=doc.getElementsByClassName("cart__item"); // Coleta somente o objeto que contém a classe "cart__item", ou seja, somente pega o abjeto "<article>" recém criado e salva na variável "recentArticles"
-      listProducts.appendChild(recentArticles[0]); // Agora sim, anexa somente este objeto (posição 0) ao HTML do carrinho, dentro da tag "<section id='cart__items'>"
+      listProducts.appendChild(recentArticles[0]); // Agora, anexa somente este objeto (posição 0) ao HTML do carrinho, dentro da tag "<section id='cart__items'>"
 
       //functions that shows final amount dinamically on the HTML
       let htmlTotalPrice = document.getElementById('totalPrice');
@@ -159,12 +158,11 @@ pageReady(function(){
         }
       },false);
 
-      //# Início da alteração 2 # Adicionei já também na mesma promise, funções para quando o cliente mudar as quantidades no carrinho
       let inputQuantity = articleItem.querySelector('.itemQuantity');
       let originalQuantity = inputQuantity.value;
       inputQuantity.addEventListener("change",function(event){
         if(this.value >100 || (this.value <=0 && this.value !="") || this.value % 1 !=0){
-          alert("quantité non autorisée - choisissez un valeur entre 1 - 100")
+          alert("quantité non autorisée - choisissez une valeur entre 1 - 100")
           location.reload();
         }
         else {
@@ -177,7 +175,7 @@ pageReady(function(){
   //FORM VALIDATION - creates the form eventListener
   let formCart = document.getElementsByClassName("cart__order__form");
   formCart[0].addEventListener("submit", function(event){
-    event.preventDefault()
+    event.preventDefault() //creates the variables for the form validation
     let firstName = document.getElementById("firstName");
     let lastName = document.getElementById("lastName");
     let address = document.getElementById("address");
@@ -228,7 +226,7 @@ pageReady(function(){
         }
   })
 });
-// FORM VALIDATION - checks if there is only letters on the form champ nom and prenom and city
+// FORM VALIDATION - checks if there is only letters on the form field nom and prenom and ville
 function allLetters(input){
   let letters = /^[\-/A-Za-z\u00C0-\u017F ]+$/;
   let inputName = "";
